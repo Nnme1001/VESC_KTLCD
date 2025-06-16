@@ -20,6 +20,7 @@
 #pragma GCC push_options
 #pragma GCC optimize ("Os")
 
+#include "lcd3.h"
 #include "mc_interface.h"
 #include "mcpwm.h"
 #include "mcpwm_foc.h"
