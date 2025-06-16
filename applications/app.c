@@ -118,15 +118,19 @@ void app_set_configuration(app_configuration *conf) {
 			app_uartcomm_start(UART_PORT_COMM_HEADER);
 			break;
 
-		case APP_NUNCHUK:
-			app_nunchuk_start();
-			break;
+		//case APP_NUNCHUK:
+			//app_nunchuk_start();
+			//break;
 
 		case APP_PAS:
+			hw_stop_i2c();
+			app_uartcomm_start(UART_PORT_COMM_HEADER);
 			app_pas_start(true);
 			break;
 
 		case APP_ADC_PAS:
+			hw_stop_i2c();
+			app_uartcomm_start(UART_PORT_COMM_HEADER);
 			app_adc_start(false);
 			app_pas_start(false);
 			break;
@@ -141,6 +145,7 @@ void app_set_configuration(app_configuration *conf) {
 		case APP_CUSTOM:
 #ifdef APP_CUSTOM_TO_USE
 			hw_stop_i2c();
+			app_uartcomm_start(UART_PORT_COMM_HEADER);
 			app_custom_start();
 #endif
 			break;
