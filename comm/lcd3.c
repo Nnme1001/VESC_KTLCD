@@ -82,18 +82,51 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
         app_pas_set_one_magnet(false);
     }
 
-    float current_scale = 0.0;
+// Изменение порогов напряжения батреи 13S в зависимости от того, подключена ли повышайка (+16,8 вольт)
+	float v = (float)GET_INPUT_VOLTAGE();
+    if (v < 56.0) { // повышайка не подключена, но диоды повышайки в выключенном состоянии крадут 0,5 вольта
+    mcconf->l_min_vin = 39.5; //40-0.5
+	mcconf->l_max_vin = 54.1; //54.6-0.5
+	mcconf->l_battery_cut_start = 42.5; //43-0.5
+	mcconf->l_battery_cut_end = 39.5; //40-0.5
+	}
+    else { // повышайка подключена, к напряжению добавлено +16,8 вольт
+    mcconf->l_min_vin = 56.8; //40+16.8
+	mcconf->l_max_vin = 72.6; //54.6+16.8+1.2 максимальный порог здесь чуть выше, чем +16,8, т.к. на холостом ходу повышайка добавляет 18 вольт
+	mcconf->l_battery_cut_start = 59.8; //43+16.8
+	mcconf->l_battery_cut_end = 56.8; //40+16.8
+	}
 
-    if (lcd_pas_mode == 1)
-    current_scale = 0.20;
-    else if (lcd_pas_mode == 2)
-    current_scale = 0.35;
-    else if (lcd_pas_mode == 3)
-    current_scale = 0.55;
-    else if (lcd_pas_mode == 4)
-    current_scale = 0.75;
-    else if (lcd_pas_mode == 5)
+// Теперь не только коэффициент тока, но и лимиты мощности и оборотов задаются в зависимости от выбранной передачи (по сути - здесь зашиты 5 профилей)
+    float current_scale = 0.0;
+	float current_power = 1000;
+	float current_rpm = 9150; //~40км/ч
+
+    if (lcd_pas_mode == 1) {
+    current_scale = 0.33;
+	current_power = 600;
+	current_rpm = 6900; //~30км/ч
+	}
+    else if (lcd_pas_mode == 2) {
+    current_scale = 0.5;
+	current_power = 900;
+	current_rpm = 9150; //~40км/ч
+	}
+    else if (lcd_pas_mode == 3) {
+    current_scale = 0.72;
+	current_power = 1300;
+	current_rpm = 9150; //~40км/ч
+	}
+    else if (lcd_pas_mode == 4) {
+    current_scale = 0.89;
+	current_power = 1600;
+	current_rpm = 11500; //~50км/ч
+	}
+    else if (lcd_pas_mode == 5) {
     current_scale = 1;
+	current_power = 1800;
+	current_rpm = 16000; //~70км/ч
+	}
 
 
 
@@ -106,6 +139,8 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
             app_adc_set_op_scaling(current_scale);
         } else {
             mcconf->l_current_max_scale = current_scale;
+			mcconf->l_watt_max = current_power;
+			mcconf->l_max_erpm = current_rpm;
         }
     }
 
@@ -114,6 +149,8 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
             app_adc_set_op_scaling(current_scale);
         } else {
             mcconf->l_current_max_scale = current_scale;
+			mcconf->l_watt_max = current_power;
+			mcconf->l_max_erpm = current_rpm;
         }
     }
 
@@ -180,10 +217,6 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
     sb[0] = 0x41;
 
     // --- начало блока с цикличным выводом температуры ---
-	//при попадании температуры в диапазон l_temp_motor_start...l_temp_motor_end из настроек темпеературы мотора
-	//инициализируется штатная процедура дисплея предупреждения о перегреве - индикацией фейковой температуры в диапазоне от 120 до 130, где 120 и 130
-	//-крайние фейковые значения, соответствующие температуре из настроек: l_temp_motor_start и l_temp_motor_end.
-	//В отличии от штатной процедуры дисплея предупреждения о перегреве, температура не перекрывает собой потребляемую мощность, т.к. теперь значения выводятся циклично
     systime_t now = chVTGetSystemTimeX();
     uint32_t elapsed_ms = (now - last_temp_toggle_time) * 1000 / CH_CFG_ST_FREQUENCY; // время в миллисекундах
     if (elapsed_ms >= 10000) {
