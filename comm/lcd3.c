@@ -85,49 +85,48 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
 // Изменение порогов напряжения батреи 13S в зависимости от того, подключена ли повышайка (+16,8 вольт)
 	float v = (float)GET_INPUT_VOLTAGE();
     if (v < 56.0) { // повышайка не подключена, но диоды повышайки в выключенном состоянии крадут 0,5 вольта
-    mcconf->l_min_vin = 39.5; //40-0.5
+	mcconf->l_min_vin = 39.5; //40-0.5
 	mcconf->l_max_vin = 54.1; //54.6-0.5
 	mcconf->l_battery_cut_start = 42.5; //43-0.5
 	mcconf->l_battery_cut_end = 39.5; //40-0.5
 	}
     else { // повышайка подключена, к напряжению добавлено +16,8 вольт
-    mcconf->l_min_vin = 56.8; //40+16.8
+	mcconf->l_min_vin = 56.8; //40+16.8
 	mcconf->l_max_vin = 72.6; //54.6+16.8+1.2 максимальный порог здесь чуть выше, чем +16,8, т.к. на холостом ходу повышайка добавляет 18 вольт
 	mcconf->l_battery_cut_start = 59.8; //43+16.8
 	mcconf->l_battery_cut_end = 56.8; //40+16.8
 	}
 
 // Теперь не только коэффициент тока, но и лимиты мощности и оборотов задаются в зависимости от выбранной передачи (по сути - здесь зашиты 5 профилей)
-    float current_scale = 0.0;
+	float current_scale = 0.0;
 	float current_power = 1000;
 	float current_rpm = 9150; //~40км/ч
 
     if (lcd_pas_mode == 1) {
-    current_scale = 0.33;
+	current_scale = 0.33;
 	current_power = 600;
 	current_rpm = 6900; //~30км/ч
 	}
     else if (lcd_pas_mode == 2) {
-    current_scale = 0.5;
+	current_scale = 0.5;
 	current_power = 900;
 	current_rpm = 9150; //~40км/ч
 	}
     else if (lcd_pas_mode == 3) {
-    current_scale = 0.72;
+	current_scale = 0.72;
 	current_power = 1300;
 	current_rpm = 9150; //~40км/ч
 	}
     else if (lcd_pas_mode == 4) {
-    current_scale = 0.89;
+	current_scale = 0.89;
 	current_power = 1600;
 	current_rpm = 11500; //~50км/ч
 	}
     else if (lcd_pas_mode == 5) {
-    current_scale = 1;
+	current_scale = 1;
 	current_power = 1800;
 	current_rpm = 16000; //~70км/ч
 	}
-
 
 
     if(fixed_throttle_level == 0) {
@@ -138,9 +137,9 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
             mcconf->l_current_max_scale = 1.0;
             app_adc_set_op_scaling(current_scale);
         } else {
-            mcconf->l_current_max_scale = current_scale;
-			mcconf->l_watt_max = current_power;
-			mcconf->l_max_erpm = current_rpm;
+		mcconf->l_current_max_scale = current_scale;
+		mcconf->l_watt_max = current_power;
+		mcconf->l_max_erpm = current_rpm;
         }
     }
 
@@ -148,9 +147,9 @@ void lcd3_process_packet(unsigned char *data, unsigned int len,
         if(adc_scaling) {
             app_adc_set_op_scaling(current_scale);
         } else {
-            mcconf->l_current_max_scale = current_scale;
-			mcconf->l_watt_max = current_power;
-			mcconf->l_max_erpm = current_rpm;
+		mcconf->l_current_max_scale = current_scale;
+		mcconf->l_watt_max = current_power;
+		mcconf->l_max_erpm = current_rpm;
         }
     }
 
