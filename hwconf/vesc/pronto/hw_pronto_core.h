@@ -171,6 +171,10 @@
 #define HW_ADC_EXT_PIN			7
 #define HW_ADC_EXT2_GPIO		GPIOA
 #define HW_ADC_EXT2_PIN			6
+#define HW_ADC_EXT3_GPIO		GPIOA
+#define HW_ADC_EXT3_PIN			3
+#define HW_ADC_EXT4_GPIO		GPIOC
+#define HW_ADC_EXT4_PIN			4
 
 // UART Peripheral
 #define HW_UART_DEV				SD3
@@ -284,6 +288,9 @@
 #endif
 #ifndef APPCONF_SHUTDOWN_MODE
 #define APPCONF_SHUTDOWN_MODE			SHUTDOWN_MODE_ALWAYS_ON
+#endif
+#ifndef APPCONF_APP_TO_USE
+#define APPCONF_APP_TO_USE				APP_NONE
 #endif
 
 // Setting limits
