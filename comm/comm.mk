@@ -1,4 +1,5 @@
 CSRC += \
+	comm/lcd3.c \
 	comm/commands.c \
 	comm/comm_usb_serial.c \
 	comm/comm_usb.c \
@@ -7,4 +8,3 @@ CSRC += \
 	comm/log.c
 
 INCDIR += comm
-

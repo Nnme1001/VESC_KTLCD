@@ -127,13 +127,13 @@
 
 // Component parameters (can be overridden)
 #ifndef V_REG
-#define V_REG				    3.34
+#define V_REG				    3.40
 #endif
 #ifndef VIN_R1
-#define VIN_R1				    56000.0 
+#define VIN_R1				    560000.0 
 #endif
 #ifndef VIN_R2
-#define VIN_R2				    2200.0 
+#define VIN_R2				    21500.0 
 #endif
 #ifndef CURRENT_AMP_GAIN
 #define CURRENT_AMP_GAIN		20.0 
