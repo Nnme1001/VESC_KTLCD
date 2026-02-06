@@ -42,7 +42,7 @@
 
 // Threads
 static THD_FUNCTION(pas_thread, arg);
-__attribute__((section(".ram4"))) static THD_WORKING_AREA(pas_thread_wa, 512);
+static THD_WORKING_AREA(pas_thread_wa, 512);
 
 // Private variables
 static volatile pas_config config;
@@ -147,9 +147,10 @@ void pas_event_handler(void) {
 	static float period_filtered = 0;
 	static int32_t correct_direction_counter = 0;
 	static uint8_t count = 0;
-	
+
 	if(pas_one_magnet){
-		uint8_t	pas_level = palReadPad(GPIOA, 13);
+	
+	uint8_t	pas_level = palReadPad(GPIOA, 13);
 
 		new_state = pas_level;
 
@@ -242,27 +243,27 @@ void pas_event_handler(void) {
 
 		const float timestamp = (float)chVTGetSystemTimeX() / (float)CH_CFG_ST_FREQUENCY;
 
-		// sensors are poorly placed, so use only one rising edge as reference
-		if( (new_state == 3) && (correct_direction_counter >= 4) ) {
-			float period = (timestamp - old_timestamp) * (float)config.magnets;
-			old_timestamp = timestamp;
+	// sensors are poorly placed, so use only one rising edge as reference
+	if( (new_state == 3) && (correct_direction_counter >= 4) ) {
+		float period = (timestamp - old_timestamp) * (float)config.magnets;
+		old_timestamp = timestamp;
 
-	UTILS_LP_FAST(period_filtered, period, 1.0);
-	if(period_filtered < min_pedal_period) { //can't be that short, abort
-				return;
-			}
-			pedal_rpm = 60.0 / period_filtered;
-			pedal_rpm *= (direction_conf * (float)direction_qem);
-			inactivity_time = 0.0;
-			correct_direction_counter = 0;
+		UTILS_LP_FAST(period_filtered, period, 1.0);
+
+		if(period_filtered < min_pedal_period) { //can't be that short, abort
+			return;
+		}
+		pedal_rpm = 60.0 / period_filtered;
+		pedal_rpm *= (direction_conf * (float)direction_qem);
+		inactivity_time = 0.0;
+		correct_direction_counter = 0;
 	}
 	else {
-			inactivity_time += 1.0 / (float)config.update_rate_hz;
+		inactivity_time += 1.0 / (float)config.update_rate_hz;
 
-			//if no pedal activity, set RPM as zero
-			if(inactivity_time > max_pulse_period) {
-				pedal_rpm = 0.0;
-			}
+		//if no pedal activity, set RPM as zero
+		if(inactivity_time > max_pulse_period) {
+			pedal_rpm = 0.0;
 		}
 	}
 #endif
@@ -275,6 +276,8 @@ static THD_FUNCTION(pas_thread, arg) {
 	chRegSetThreadName("APP_PAS");
 
 #ifdef HW_PAS1_PORT
+	palSetPadMode(HW_PAS1_PORT, HW_PAS1_PIN, PAL_MODE_INPUT_PULLUP);
+	palSetPadMode(HW_PAS2_PORT, HW_PAS2_PIN, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOA, 13, PAL_MODE_INPUT_PULLUP);
 	if(pas_one_magnet == 0){
 	palSetPadMode(GPIOA, 14, PAL_MODE_INPUT_PULLUP);

@@ -50,6 +50,7 @@ void app_adc_adc2_override(float val);
 void app_adc_detach_buttons(bool state);
 void app_adc_rev_override(bool state);
 void app_adc_cc_override(bool state);
+void app_adc_set_op_scaling(float scaling);
 bool app_adc_range_ok(void);
 
 typedef enum {
@@ -63,6 +64,7 @@ void app_uartcomm_start(UART_PORT port_number);
 void app_uartcomm_stop(UART_PORT port_number);
 void app_uartcomm_configure(uint32_t baudrate, bool permanent_enabled, UART_PORT port_number);
 void app_uartcomm_send_packet(unsigned char *data, unsigned int len,  UART_PORT port_number);
+void app_uartcomm_send_raw_packet(unsigned char *data, unsigned int len,  UART_PORT port_number);
 
 void app_nunchuk_start(void);
 void app_nunchuk_stop(void);
@@ -82,6 +84,8 @@ void app_pas_configure(pas_config *conf);
 float app_pas_get_current_target_rel(void);
 float app_pas_get_pedal_rpm(void);
 void app_pas_set_current_sub_scaling(float current_sub_scaling);
+void app_pas_set_one_magnet(bool use_one_magnet);
+bool app_pas_get_reverse_pedaling(void);
 
 // Custom apps
 void app_custom_start(void);
